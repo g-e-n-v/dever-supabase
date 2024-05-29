@@ -1,15 +1,34 @@
 const express = require("express");
+const supabase = require("../supabase/client");
 
 const controller = express.Router();
 
 // INFO: Create
 controller.post("/", async (req, res) => {
-  res.send("Method `POST /` not implement");
+  const note = req.body;
+  console.log(note);
+
+  const { data, error } = await supabase.from("note").insert([note]).select();
+
+  if (error) {
+    return res.status(error.status ?? 400).json({ message: error.message });
+  }
+
+  return res.status(200).json(data);
 });
 
 // INFO: Get all
 controller.get("/", async (req, res) => {
-  res.send("Method `GET /` not implement");
+  const { data, error } = await supabase.from("note").select(`
+    *,
+    status (name)
+  `);
+
+  if (error) {
+    return res.status(error.status ?? 400).json({ message: error.message });
+  }
+
+  return res.status(200).json(data);
 });
 
 // INFO: Get one

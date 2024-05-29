@@ -15,17 +15,10 @@ controller.post("/sign-up", async (req, res) => {
   });
 
   if (error) {
-    return res.status(error.status).json({
-      status: error.status,
-      code: error.code,
-      name: error.name,
-      message: error.message,
-    });
+    return res.status(error.status).json({ message: error.message });
   }
 
-  if (data) {
-    res.status(200).json(data);
-  }
+  return res.status(200).json(data);
 });
 
 controller.post("/sign-in", async (req, res) => {
@@ -34,12 +27,29 @@ controller.post("/sign-in", async (req, res) => {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    return res.status(error.status).json({
-      status: error.status,
-      code: error.code,
-      name: error.name,
-      message: error.message,
-    });
+    return res.status(error.status).json({ message: error.message });
+  }
+
+  return res.status(200).json(data);
+});
+
+controller.post("/refresh-token", async (req, res) => {
+  const { refresh_token } = req.body;
+  const { data, error } = await supabase.auth.refreshSession({ refresh_token });
+
+  if (error) {
+    return res.status(error.status).json({ message: error.message });
+  }
+
+  return res.status(200).json(data);
+});
+
+controller.get("/me", async (req, res) => {
+  const token = req.headers.authorization.replace("Bearer ", "");
+  const { data, error } = await supabase.auth.getUser(token);
+
+  if (error) {
+    return res.status(error.status).json({ message: error.message });
   }
 
   return res.status(200).json(data);
