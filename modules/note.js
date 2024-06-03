@@ -1,12 +1,12 @@
 const express = require("express");
-const supabase = require("../supabase/client");
 
 const controller = express.Router();
 
 // INFO: Create
 controller.post("/", async (req, res) => {
+  const supabase = createClient({ req, res });
+
   const note = req.body;
-  console.log(note);
 
   const { data, error } = await supabase.from("note").insert([note]).select();
 
@@ -19,6 +19,8 @@ controller.post("/", async (req, res) => {
 
 // INFO: Get all
 controller.get("/", async (req, res) => {
+  const supabase = createClient({ req, res });
+
   const { data, error } = await supabase.from("note").select(`
     *,
     status (name)
